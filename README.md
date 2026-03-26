@@ -1,108 +1,115 @@
-# 🚀 Automated Windows Server 2019 AD DS Setup with Vagrant
+# Windows Server AD DS Automation
 
-This project **automates the installation and configuration of Windows Server 2019 with Active Directory Domain Services (AD DS)** using **Vagrant + VirtualBox**.
+Automated installation and configuration of Windows Server 2019 with Active Directory Domain Services (AD DS) using Vagrant and VirtualBox. One command creates a fully functional Domain Controller — no manual setup required.
 
-✅ Uses a **prebuilt Windows Server 2019 Vagrant box** → No ISO required  
-✅ Automatically installs and configures **Active Directory Domain Services (AD DS)**  
-✅ Runs a **PowerShell script (`set-up.ps1`)** to promote the server to a Domain Controller  
+## What It Does
 
----
+1. **Provisions** a Windows Server 2019 VM using a prebuilt Vagrant box (no ISO needed)
+2. **Installs** Active Directory Domain Services
+3. **Promotes** the server to a Domain Controller
+4. **Configures** DNS automatically
 
-## 📖 About This Project
-This project is designed to help students, IT professionals, and system administrators quickly create a **Windows Server 2019 Domain Controller** in a **fully automated way**.  
-
-It eliminates manual installation steps by using:  
-- A **prebuilt Windows Server 2019 Vagrant box**  
-- **`set-up.ps1`** PowerShell script for AD DS installation  
-- (Optional) **`Automated.xml`** for auto-logon settings  
-
----
-
-## 📂 Project Structure
-
-
-📁 windows-server-ad-ds/
-
-│── Vagrantfile         # Vagrant configuration for VM setup
-
-
-│── Automated.xml       # Used for auto-logon configuration (optional)
-
-
-│── set-up.ps1          # PowerShell script to install and configure AD DS
-
-
-
----
-
-## ⚙️ Features
-✅ **No Windows ISO needed** – Uses `gusztavvargadr/windows-server-2019-standard` box  
-✅ Automatic **AD DS installation and configuration**  
-✅ Creates a **domain controller** without manual steps  
-✅ Quick and easy setup using **Vagrant + VirtualBox**
-
----
-
-## 🔧 Prerequisites
-Install the following on your host system:
-
-- [VirtualBox] (https://www.virtualbox.org/wiki/Downloads) 
-- [Vagrant] (https://developer.hashicorp.com/vagrant/downloads)  
-
----
-
-## ▶️ How to Use
-
-### 1️⃣ Clone the Repository
-git clone [https://github.com/shyam1401/Windows-server-ad-ds-automation.git]
-
-cd windows-server-ad-ds
-
-### 2️⃣ Start the VM
+```
 vagrant up
+    ↓
+VirtualBox creates Windows Server 2019 VM
+    ↓
+PowerShell script (set-up.ps1) runs automatically
+    ↓
+AD DS feature installed
+    ↓
+New forest created (power.local)
+    ↓
+Server promoted to Domain Controller
+    ↓
+Ready to use
+```
 
-## ✅ What happens automatically:
-✅ A Windows Server 2019 VM is created using the prebuilt box 
+## What Gets Created
 
-✅ On first boot, set-up.ps1 installs and configures AD DS  
+| Component | Value |
+|-----------|-------|
+| Domain Name | `power.local` |
+| NetBIOS Name | `POWER` |
+| DNS | Installed automatically |
+| Domain Controller | The VM itself |
 
-✅ The VM becomes a Domain Controller  
+## Project Structure
 
-## 3️⃣ Access the VM
+```
+Windows-server-ad-ds-automation/
+├── Vagrantfile          # VM configuration (memory, CPU, network)
+├── set-up.ps1           # PowerShell script — installs AD DS and promotes to DC
+└── autounattend.xml     # Auto-logon configuration (optional)
+```
+
+## Tech Stack
+
+| Tool | Purpose |
+|------|---------|
+| Vagrant | VM provisioning and management |
+| VirtualBox | Virtualization platform |
+| PowerShell | AD DS installation and configuration |
+| Windows Server 2019 | Server OS (prebuilt Vagrant box) |
+
+## Setup
+
+### Prerequisites
+
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+- [Vagrant](https://developer.hashicorp.com/vagrant/downloads)
+
+### Deploy
+
+```bash
+git clone https://github.com/0xShyam-Sec/Windows-server-ad-ds-automation.git
+cd Windows-server-ad-ds-automation
+vagrant up
+```
+
+The VM will boot, run the PowerShell script, and reboot as a Domain Controller. This takes 10-15 minutes depending on your hardware.
+
+### Access the VM
+
+```bash
 vagrant rdp
+```
 
-or open Virtualbox Manually
+Or open VirtualBox and access the VM directly.
 
-## Default credentials for the Vagrant box:
-Username:-  vagrant
+**Default credentials:**
 
-Password:-  vagrant
+| Account | Username | Password |
+|---------|----------|----------|
+| Vagrant box | `vagrant` | `vagrant` |
+| Domain Admin | `Administrator` | Defined in `set-up.ps1` |
 
+> **Important:** Change the default passwords in `set-up.ps1` before using in any non-lab environment.
 
-Once inside, you can use the AD DS credentials defined in set-up.ps1 (default: Administrator / P@ssw0rd!).
+## Customization
 
----
+| File | What to Change |
+|------|---------------|
+| `set-up.ps1` | Domain name (`-DomainName`), admin password, NetBIOS name |
+| `Vagrantfile` | VM name, memory (`vb.memory`), CPUs (`vb.cpus`), network settings |
+| `autounattend.xml` | Auto-logon settings, hostname |
 
-## ⚙ Configuration / Customization
+## Troubleshooting
 
-| File            | What to Edit                                                                 |
-|-----------------|------------------------------------------------------------------------------|
-| `set-up.ps1`    | Change domain name (`-DomainName`), admin password, or other AD DS options. |
-| `Vagrantfile`   | Modify VM name, memory (`vb.memory`), CPUs (`vb.cpus`), or static IP.        |
-| `Automated.xml` | *(Optional)* Modify auto-logon settings or hostname.                         |
+| Problem | Solution |
+|---------|----------|
+| VM fails to boot | Ensure VirtualBox and Vagrant are installed and up to date |
+| Provisioning error | Run `vagrant reload --provision` |
+| AD DS setup fails | Check `set-up.ps1` for correct domain name and password format |
+| Cannot RDP into VM | Ensure RDP is enabled or use `vagrant rdp` |
+| Need static IP | Edit `config.vm.network` in `Vagrantfile` |
 
----
+## Cleanup
 
-## ⚠ Troubleshooting
+```bash
+vagrant destroy -f
+```
 
-| Problem              | Solution                                                                 |
-|----------------------|--------------------------------------------------------------------------|
-| VM fails to boot      | Ensure VirtualBox and Vagrant are installed and up to date.             |
-| Provisioning error    | Run `vagrant reload --provision`.                                       |
-| AD DS setup fails     | Check `set-up.ps1` for correct domain name and password format.         |
-| Cannot RDP into VM    | Ensure RDP is enabled or use `vagrant rdp`.                             |
-| Need static IP        | Edit `config.vm.network` in `Vagrantfile` with your desired IP address. |
+## License
 
-
-
-
+MIT
